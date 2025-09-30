@@ -6,3 +6,4 @@ __pycache__/
 *.DS_Store
 Lab1(py)/data
 .env
+Lab1(py)/household_power_consumption.txt
