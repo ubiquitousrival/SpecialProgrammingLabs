@@ -8,7 +8,7 @@ last_noise_params = (0, 0)
 
 t = np.linspace(0, 10, 1000)
 fs = 1.0 / (t[1] - t[0]) 
-
+#Початкові значення
 DEFAULTS = {
     'amplitude': 1.0,
     'frequency': 1.5,
@@ -19,7 +19,7 @@ DEFAULTS = {
     'filter_cutoff': 5.0, 
     'filter_order': 4
 }
-
+#Головна функція генерації сигналу
 def harmonic_with_noise(t, amplitude, frequency, phase, noise_mean, noise_covariance, show_noise):
     global noise_cache, last_noise_params
     
@@ -37,7 +37,7 @@ def harmonic_with_noise(t, amplitude, frequency, phase, noise_mean, noise_covari
         noisy_signal = clean_signal
         
     return clean_signal, noisy_signal
-
+#Функція фільтрації
 def filter_signal(input_signal, cutoff_hz, order):
     nyquist_freq = 0.5 * fs
     normal_cutoff = cutoff_hz / nyquist_freq
@@ -49,20 +49,21 @@ def filter_signal(input_signal, cutoff_hz, order):
 
     filtered_signal = signal.filtfilt(b, a, input_signal)
     return filtered_signal
-
+#Створення голового вікна та заголовків
 fig, ax = plt.subplots(figsize=(12, 8))
 plt.subplots_adjust(left=0.25, bottom=0.45, top=0.9) 
-
+#Генерація початкових даних при запуску програми
 clean_sig, noisy_sig = harmonic_with_noise(
     t, DEFAULTS['amplitude'], DEFAULTS['frequency'], DEFAULTS['phase'],
-    DEFAULTS['noise_mean'], DEFAULTS['noise_covariance'], DEFAULTS['show_noise']
-)
+    DEFAULTS['noise_mean'], DEFAULTS['noise_covariance'], DEFAULTS['show_noise'])
+#Фільтрація початкового зашумленого сигналу
 filtered_sig = filter_signal(
-    noisy_sig, DEFAULTS['filter_cutoff'], DEFAULTS['filter_order']
-)
-
+    noisy_sig, DEFAULTS['filter_cutoff'], DEFAULTS['filter_order'])
+#Чиста гармоніка
 l_clean, = ax.plot(t, clean_sig, 'b--', label='Чиста гармоніка', alpha=0.7)
+#Зашумлений сигнал
 l_noisy, = ax.plot(t, noisy_sig, 'orange', label='Зашумлений сигнал', alpha=0.8)
+#Відфільтрований сигнал
 l_filtered, = ax.plot(t, filtered_sig, 'purple', label='Відфільтрований сигнал', linewidth=2.5)
 
 ax.set_title('Інтерактивний аналіз гармоніки та фільтрації')
@@ -71,27 +72,29 @@ ax.set_ylabel('Амплітуда y(t)')
 ax.legend(loc='upper right')
 ax.grid(True)
 ax.set_ylim([-3, 3]) 
-
+#Створення слайдерів
+#[left, bottom, width, height] - координати у % від розміру вікна
 ax_amp = plt.axes([0.15, 0.30, 0.65, 0.03])
 ax_freq = plt.axes([0.15, 0.25, 0.65, 0.03])
 ax_phase = plt.axes([0.15, 0.20, 0.65, 0.03])
 ax_n_mean = plt.axes([0.15, 0.15, 0.65, 0.03])
 ax_n_cov = plt.axes([0.15, 0.10, 0.65, 0.03])
 ax_f_cutoff = plt.axes([0.15, 0.05, 0.65, 0.03])
-
+#Cтворюємо самі Слайдери і "прикріплюємо" кожен до своєї "коробки".
+#(ax_amp, 'Label', min_val, max_val, valinit=default_val)
 s_amp = Slider(ax_amp, 'Amplitude', 0.1, 5.0, valinit=DEFAULTS['amplitude'])
 s_freq = Slider(ax_freq, 'Frequency (ω)', 0.1, 10.0, valinit=DEFAULTS['frequency'])
 s_phase = Slider(ax_phase, 'Phase (φ)', 0.0, 2 * np.pi, valinit=DEFAULTS['phase'])
 s_noise_mean = Slider(ax_n_mean, 'Noise Mean', -0.5, 0.5, valinit=DEFAULTS['noise_mean'])
 s_noise_cov = Slider(ax_n_cov, 'Noise Covariance', 0.0, 1.0, valinit=DEFAULTS['noise_covariance'])
 s_filter_cutoff = Slider(ax_f_cutoff, 'Filter Cutoff (Hz)', 0.1, 20.0, valinit=DEFAULTS['filter_cutoff'])
-
+#Створення кнопок та чекбоксів
 ax_check = plt.axes([0.85, 0.25, 0.1, 0.04])
 check_button = CheckButtons(ax_check, ['Show Noise'], [DEFAULTS['show_noise']])
 
 ax_reset = plt.axes([0.85, 0.20, 0.1, 0.04])
 reset_button = Button(ax_reset, 'Reset')
-
+#Функція викликається щоразу, коли будь-який слайдер або чекбокс змінює своє значення
 def update(val):
     amp = s_amp.val
     freq = s_freq.val
@@ -114,11 +117,8 @@ def update(val):
     ax.set_ylim([min_val - 0.1, max_val + 0.1])
     
     fig.canvas.draw_idle()
-
+#Функція викликається при натисканні кнопки Reset
 def reset(event):
-    """
-    Викликається при натисканні кнопки Reset. (Завдання 6)
-    """
     global noise_cache
     noise_cache = None
     
@@ -134,7 +134,7 @@ def reset(event):
         check_button.set_active(0)
     
     update(None)
-
+#Підключення функцій до віджетів
 s_amp.on_changed(update)
 s_freq.on_changed(update)
 s_phase.on_changed(update)
@@ -143,7 +143,7 @@ s_noise_cov.on_changed(update)
 s_filter_cutoff.on_changed(update)
 check_button.on_clicked(update)
 reset_button.on_clicked(reset)
-
+#Інструкції
 instructions = """
 Як користуватися програмою:
 1. Синій пунктир: чиста гармоніка
