@@ -1,4 +1,4 @@
-\# Camera App (C++)
+# Camera App (C++)
 
 
 
@@ -6,7 +6,7 @@
 
 
 
-\##  Як запустити
+##  Як запустити
 
 
 
@@ -16,5 +16,5 @@
 
 ```bash
 
-bash build\_run.sh
+bash build_run.sh
 
