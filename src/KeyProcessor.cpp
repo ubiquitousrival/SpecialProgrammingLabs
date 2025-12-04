@@ -6,6 +6,7 @@ void KeyProcessor::processKey(int key) {
     if (key == 27 || key == 'q') { 
         shouldExit = true;
     }
+    // Обробка натискання клавіш для зміни режимів
     switch (key) {
         case '1': currentMode = ProcessMode::Normal; break;
         case '2': currentMode = ProcessMode::Invert; break;
@@ -13,6 +14,8 @@ void KeyProcessor::processKey(int key) {
         case '4': currentMode = ProcessMode::Canny; break;
         case '5': currentMode = ProcessMode::Sobel; break;
         case '6': currentMode = ProcessMode::Mirror; break;
+        case '7': currentMode = ProcessMode::Sepia; break;
+        case '8': currentMode = ProcessMode::Pixelize; break;
     }
 }
 

@@ -6,7 +6,9 @@ CameraProvider::CameraProvider(int deviceId) {
 
 cv::Mat CameraProvider::getFrame() {
     cv::Mat frame;
-    cap >> frame;
+    if (cap.isOpened()) {
+        cap >> frame;
+    }
     return frame;
 }
 

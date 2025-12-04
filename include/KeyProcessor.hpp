@@ -1,5 +1,5 @@
 #pragma once
-#include <opencv2/core.hpp>
+#include <cstddef>
 
 enum class ProcessMode {
     Normal,
@@ -7,7 +7,9 @@ enum class ProcessMode {
     Blur,
     Canny,
     Sobel,
-    Mirror
+    Mirror,
+    Sepia,
+    Pixelize
 };
 
 class KeyProcessor {
