@@ -7,7 +7,7 @@
 int main() {
     CameraProvider camera(0);
     if (!camera.isOpened()) {
-        std::cerr << "Error: Camera not found!" << std::endl;
+        std::cout << "Error: Camera not found!" << std::endl;
         return -1;
     }
 
@@ -18,8 +18,10 @@ int main() {
     while (true) {
         cv::Mat frame = camera.getFrame();
         if (frame.empty()) break;
+
+        // Передача значень обох повзунків у процесор
+        processor.process(frame, keys.getMode(), display.brightness, display.effectValue);
         
-        processor.process(frame, keys.getMode(), display.brightness);
         display.show(frame);
 
         int key = cv::waitKey(10);

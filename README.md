@@ -13,14 +13,15 @@
    ./run.sh
 
 ## Controls
-- **Slider**: Adjusts brightness, blur intensity, or pixel size.
+- **Slider 1 (Brightness)**: Adjusts image brightness globally.
+- **Slider 2 (Effect)**: Adjusts intensity for specific modes (Blur, Canny, Sepia, Pixelize).
 - **Keys**:
   - '1': Normal Mode
   - '2': Invert Colors
-  - '3': Gaussian Blur (Interactive)
-  - '4': Canny Edge
+  - '3': Gaussian Blur (Use Effect slider)
+  - '4': Canny Edge (Use Effect slider for threshold)
   - '5': Sobel Filter
   - '6': Mirror
-  - '7': Sepia Effect (New)
-  - '8': Pixelize Effect (New)
+  - '7': Sepia Effect (Use Effect slider for mixing)
+  - '8': Pixelize Effect (Use Effect slider for pixel size)
 - **ESC / q**: Exit

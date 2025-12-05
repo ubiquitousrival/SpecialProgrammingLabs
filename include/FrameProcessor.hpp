@@ -6,5 +6,6 @@
 
 class FrameProcessor {
 public:
-    void process(cv::Mat& frame, ProcessMode mode, int value);
+    // Метод приймає два значення для повзунків
+    void process(cv::Mat& frame, ProcessMode mode, int brightnessVal, int effectVal);
 };
