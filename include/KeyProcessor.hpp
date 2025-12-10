@@ -8,7 +8,7 @@ class KeyProcessor {
 private:
     ProcessMode currentMode;
     bool shouldExit;
-    bool faceDetectionEnabled; // Новий стан
+    bool faceDetectionEnabled;
 
 public:
     KeyProcessor();
@@ -16,5 +16,5 @@ public:
     
     ProcessMode getMode() const;
     bool getShouldExit() const;
-    bool isFaceDetectionEnabled() const; // Геттер
+    bool isFaceDetectionEnabled() const;
 };

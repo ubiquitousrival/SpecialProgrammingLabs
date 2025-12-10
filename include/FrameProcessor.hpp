@@ -2,13 +2,12 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include "KeyProcessor.hpp"
-#include "FaceDetector.hpp" // Включаємо детектор сюди
+#include "FaceDetector.hpp"
 
 class FrameProcessor {
 private:
-    FaceDetector detector; // Детектор тепер живе всередині процесора
+    FaceDetector detector; // Композиція: детектор тепер частина процесора
 
 public:
-    // Додаємо прапорець isDetectionEnabled
-    void process(cv::Mat& frame, ProcessMode mode, int brightnessVal, int effectVal, bool isDetectionEnabled);
+    void process(cv::Mat& frame, ProcessMode mode, int brightnessVal, int effectVal, int lagVal, bool isDetectionEnabled);
 };

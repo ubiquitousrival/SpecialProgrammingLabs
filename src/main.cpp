@@ -7,26 +7,27 @@
 int main() {
     CameraProvider camera(0);
     if (!camera.isOpened()) {
-        std::cerr << "Error: Camera not found!" << std::endl;
+        std::cerr << "Camera Error" << std::endl;
         return -1;
     }
 
-    Display display("Lab 4: Multithreading & Architecture");
+    Display display("Lab 4: Advanced Architecture");
     KeyProcessor keys;
-    FrameProcessor processor; // Тепер містить детектор всередині
+    FrameProcessor processor; // Тепер містить всю логіку детекції
 
-    std::cout << "Press 'F' to toggle Face Detection. '1-8' for effects." << std::endl;
+    std::cout << "Controls: F (Face), 1-8 (Modes), Sliders" << std::endl;
 
     while (true) {
         cv::Mat frame = camera.getFrame();
         if (frame.empty()) break;
 
-        // Вся логіка інкапсульована в процесорі
+        // Вся магія схована тут:
         processor.process(
             frame, 
             keys.getMode(), 
             display.brightness, 
-            display.effectValue, 
+            display.effectValue,
+            display.lagValue,
             keys.isFaceDetectionEnabled()
         );
         

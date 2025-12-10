@@ -9,6 +9,8 @@ private:
 public:
     int brightness; 
     int effectValue;
+    int lagValue; // Нова змінна
+
     Display(const std::string& name);
     void show(const cv::Mat& frame);
     std::string getName();

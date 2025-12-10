@@ -2,7 +2,7 @@
 #include <iostream>
 #include <chrono>
 
-FaceDetector::FaceDetector() : isRunning(true), hasNewFrame(false) {
+FaceDetector::FaceDetector() : isRunning(true), hasNewFrame(false), artificialDelay(0), currentFps(0.0) {
     try {
         net = cv::dnn::readNetFromCaffe("deploy.prototxt", "res10_300x300_ssd_iter_140000.caffemodel");
         workerThread = std::thread(&FaceDetector::inferenceLoop, this);
@@ -14,9 +14,7 @@ FaceDetector::FaceDetector() : isRunning(true), hasNewFrame(false) {
 
 FaceDetector::~FaceDetector() {
     isRunning = false;
-    if (workerThread.joinable()) {
-        workerThread.join();
-    }
+    if (workerThread.joinable()) workerThread.join();
 }
 
 void FaceDetector::setFrame(const cv::Mat& frame) {
@@ -31,12 +29,21 @@ std::vector<cv::Rect> FaceDetector::getResults() {
     return detectedFaces;
 }
 
+void FaceDetector::setDelay(int ms) {
+    artificialDelay = ms;
+}
+
+double FaceDetector::getFps() const {
+    return currentFps;
+}
+
 void FaceDetector::inferenceLoop() {
     cv::Mat processFrame;
+    auto lastTime = std::chrono::steady_clock::now();
+    int frameCount = 0;
     
     while (isRunning) {
         bool shouldProcess = false;
-
         {
             std::lock_guard<std::mutex> lock(dataMutex);
             if (hasNewFrame && !currentFrame.empty()) {
@@ -47,8 +54,9 @@ void FaceDetector::inferenceLoop() {
         }
 
         if (shouldProcess) {
-            // Штучне навантаження (500мс), щоб показати, що інтерфейс не лагає
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            // Емуляція навантаження (слайдер)
+            int delay = artificialDelay;
+            if (delay > 0) std::this_thread::sleep_for(std::chrono::milliseconds(delay));
 
             cv::Mat blob = cv::dnn::blobFromImage(processFrame, 1.0, cv::Size(300, 300), cv::Scalar(104.0, 177.0, 123.0));
             net.setInput(blob);
@@ -72,8 +80,18 @@ void FaceDetector::inferenceLoop() {
                 std::lock_guard<std::mutex> lock(dataMutex);
                 detectedFaces = newFaces;
             }
+
+            // FPS Counter
+            frameCount++;
+            auto now = std::chrono::steady_clock::now();
+            double elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastTime).count();
+            if (elapsed >= 1.0) {
+                currentFps = frameCount / elapsed;
+                frameCount = 0;
+                lastTime = now;
+            }
         } else {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
         }
     }
 }

@@ -1,24 +1,20 @@
 #include "KeyProcessor.hpp"
-#include <iostream> // Для логування перемикання
+#include <iostream>
 
 KeyProcessor::KeyProcessor() 
     : currentMode(ProcessMode::Normal), shouldExit(false), faceDetectionEnabled(false) {}
 
 void KeyProcessor::processKey(int key) {
-    if (key == -1) return; // Нічого не натиснуто
+    if (key == -1) return;
 
-    // Системні клавіші
-    if (key == 27 || key == 'q') { 
-        shouldExit = true;
-    }
+    if (key == 27 || key == 'q') shouldExit = true;
     
-    // Перемикач детекції
+    // Обробка перемикача тут
     if (key == 'f' || key == 'F') {
         faceDetectionEnabled = !faceDetectionEnabled;
         std::cout << "Face Detection: " << (faceDetectionEnabled ? "ON" : "OFF") << std::endl;
     }
 
-    // Режими обробки
     switch (key) {
         case '1': currentMode = ProcessMode::Normal; break;
         case '2': currentMode = ProcessMode::Invert; break;
