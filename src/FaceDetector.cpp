@@ -21,7 +21,6 @@ FaceDetector::~FaceDetector() {
 
 void FaceDetector::setFrame(const cv::Mat& frame) {
     if (frame.empty()) return;
-
     std::lock_guard<std::mutex> lock(dataMutex);
     frame.copyTo(currentFrame);
     hasNewFrame = true;
@@ -48,6 +47,9 @@ void FaceDetector::inferenceLoop() {
         }
 
         if (shouldProcess) {
+            // Штучне навантаження (500мс), щоб показати, що інтерфейс не лагає
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
             cv::Mat blob = cv::dnn::blobFromImage(processFrame, 1.0, cv::Size(300, 300), cv::Scalar(104.0, 177.0, 123.0));
             net.setInput(blob);
             cv::Mat detections = net.forward();
@@ -57,13 +59,11 @@ void FaceDetector::inferenceLoop() {
 
             for (int i = 0; i < detectionMat.rows; i++) {
                 float confidence = detectionMat.at<float>(i, 2);
-
                 if (confidence > 0.5) {
                     int x1 = static_cast<int>(detectionMat.at<float>(i, 3) * processFrame.cols);
                     int y1 = static_cast<int>(detectionMat.at<float>(i, 4) * processFrame.rows);
                     int x2 = static_cast<int>(detectionMat.at<float>(i, 5) * processFrame.cols);
                     int y2 = static_cast<int>(detectionMat.at<float>(i, 6) * processFrame.rows);
-
                     newFaces.emplace_back(cv::Rect(cv::Point(x1, y1), cv::Point(x2, y2)));
                 }
             }
@@ -72,9 +72,6 @@ void FaceDetector::inferenceLoop() {
                 std::lock_guard<std::mutex> lock(dataMutex);
                 detectedFaces = newFaces;
             }
-            
-            // Штучна затримка для демонстрації асинхронності
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
         } else {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
