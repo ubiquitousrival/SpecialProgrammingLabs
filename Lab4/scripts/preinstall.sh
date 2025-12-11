@@ -1,5 +1,5 @@
 #!/bin/bash
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit
 
 echo "Installing dependencies (Linux only)..."
 if [ -x "$(command -v apt-get)" ]; then
