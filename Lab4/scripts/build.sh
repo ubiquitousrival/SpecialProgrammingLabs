@@ -2,8 +2,11 @@
 
 cd "$(dirname "$0")/.." || exit
 
-mkdir -p build
-cd build
+if [ ! -d "build" ]; then
+  mkdir build
+fi
+
+cd build || exit
 
 cmake ..
 make
