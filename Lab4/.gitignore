@@ -2,3 +2,4 @@ build/
 *.caffemodel
 *.prototxt
 .vscode/
+*.caffemodel

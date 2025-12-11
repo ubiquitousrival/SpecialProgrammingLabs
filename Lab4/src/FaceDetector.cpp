@@ -3,10 +3,10 @@
 #include <chrono>
 
 FaceDetector::FaceDetector() : isRunning(true), hasNewFrame(false), artificialDelay(0), currentFps(0.0) {
-    try {
-        net = cv::dnn::readNetFromCaffe("deploy.prototxt", "res10_300x300_ssd_iter_140000.caffemodel");
-        workerThread = std::thread(&FaceDetector::inferenceLoop, this);
-    } catch (const cv::Exception& e) {
+   try {
+    net = cv::dnn::readNetFromCaffe("resources/deploy.prototxt", "resources/res10_300x300_ssd_iter_140000.caffemodel");
+    workerThread = std::thread(&FaceDetector::inferenceLoop, this);
+} catch (const cv::Exception& e) {
         std::cerr << "Detector Error: " << e.what() << std::endl;
         isRunning = false;
     }

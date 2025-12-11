@@ -6,7 +6,7 @@
 
 class FrameProcessor {
 private:
-    FaceDetector detector; // Композиція: детектор тепер частина процесора
+    FaceDetector detector;
 
 public:
     void process(cv::Mat& frame, ProcessMode mode, int brightnessVal, int effectVal, int lagVal, bool isDetectionEnabled);
