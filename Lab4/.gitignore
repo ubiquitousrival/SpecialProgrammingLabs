@@ -1,5 +1,5 @@
 build/
-*.caffemodel
+resources/*.caffemodel
 *.prototxt
 .vscode/
 *.caffemodel
