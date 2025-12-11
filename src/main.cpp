@@ -13,7 +13,7 @@ int main() {
 
     Display display("Lab 4: Advanced Architecture");
     KeyProcessor keys;
-    FrameProcessor processor; // Тепер містить всю логіку детекції
+    FrameProcessor processor; 
 
     std::cout << "Controls: F (Face), 1-8 (Modes), Sliders" << std::endl;
 
@@ -21,7 +21,6 @@ int main() {
         cv::Mat frame = camera.getFrame();
         if (frame.empty()) break;
 
-        // Вся магія схована тут:
         processor.process(
             frame, 
             keys.getMode(), 

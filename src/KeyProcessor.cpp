@@ -9,7 +9,6 @@ void KeyProcessor::processKey(int key) {
 
     if (key == 27 || key == 'q') shouldExit = true;
     
-    // Обробка перемикача тут
     if (key == 'f' || key == 'F') {
         faceDetectionEnabled = !faceDetectionEnabled;
         std::cout << "Face Detection: " << (faceDetectionEnabled ? "ON" : "OFF") << std::endl;

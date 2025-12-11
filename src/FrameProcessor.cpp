@@ -5,15 +5,12 @@
 
 void FrameProcessor::process(cv::Mat& frame, ProcessMode mode, int brightnessVal, int effectVal, int lagVal, bool isDetectionEnabled) {
     
-    // Передаємо затримку в детектор
     detector.setDelay(lagVal);
 
-    // Відправляємо кадр на розпізнавання (асинхронно)
     if (isDetectionEnabled) {
         detector.setFrame(frame);
     }
 
-    // Обробка зображення
     double alpha = 1.0 + (brightnessVal - 50) / 50.0;
     frame.convertTo(frame, -1, alpha, 0);
 
@@ -56,12 +53,10 @@ void FrameProcessor::process(cv::Mat& frame, ProcessMode mode, int brightnessVal
         default: break;
     }
 
-    // Малювання рамок ПОВЕРХ ефектів
     if (isDetectionEnabled) {
         std::vector<cv::Rect> faces = detector.getResults();
         
         for (auto rect : faces) {
-            // FIX: Якщо режим Дзеркало, перевертаємо координати X
             if (mode == ProcessMode::Mirror) {
                 rect.x = frame.cols - rect.x - rect.width;
             }
@@ -71,7 +66,6 @@ void FrameProcessor::process(cv::Mat& frame, ProcessMode mode, int brightnessVal
                         cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2);
         }
 
-        // Виводимо FPS детектора
         std::stringstream ss;
         ss << "Detector FPS: " << std::fixed << std::setprecision(1) << detector.getFps();
         cv::putText(frame, ss.str(), cv::Point(10, 60), 

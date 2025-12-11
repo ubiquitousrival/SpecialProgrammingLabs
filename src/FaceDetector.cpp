@@ -54,7 +54,6 @@ void FaceDetector::inferenceLoop() {
         }
 
         if (shouldProcess) {
-            // Емуляція навантаження (слайдер)
             int delay = artificialDelay;
             if (delay > 0) std::this_thread::sleep_for(std::chrono::milliseconds(delay));
 
@@ -81,7 +80,6 @@ void FaceDetector::inferenceLoop() {
                 detectedFaces = newFaces;
             }
 
-            // FPS Counter
             frameCount++;
             auto now = std::chrono::steady_clock::now();
             double elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastTime).count();

@@ -5,7 +5,6 @@ Display::Display(const std::string& name)
     cv::namedWindow(windowName);
     cv::createTrackbar("Brightness", windowName, &brightness, 100);
     cv::createTrackbar("Effect", windowName, &effectValue, 100);
-    // Новий слайдер: Лаг від 0 до 1000 мс
     cv::createTrackbar("Lag (ms)", windowName, &lagValue, 1000);
 }
 
