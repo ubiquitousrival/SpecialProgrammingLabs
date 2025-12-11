@@ -11,9 +11,22 @@ Advanced C++ OpenCV project with asynchronous face detection.
 
 ## Build & Run
 
-1. `./preinstall.sh`
-2. `./build.sh`
-3. `./run.sh`
+To build and run the project, use the scripts provided in the `scripts` directory:
+
+1.  **Install dependencies (if needed):**
+    ```bash
+    ./scripts/preinstall.sh
+    ```
+
+2.  **Build the project:**
+    ```bash
+    ./scripts/build.sh
+    ```
+
+3.  **Run the application:**
+    ```bash
+    ./scripts/run.sh
+    ```
 
 ## Controls
 
