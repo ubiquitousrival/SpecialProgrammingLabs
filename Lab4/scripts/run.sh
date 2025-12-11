@@ -9,7 +9,7 @@ if [ -f "./build/$APP_NAME" ]; then
     ./build/$APP_NAME
 else
     echo "Error: Executable './build/$APP_NAME' not found."
-    echo "Current contents of build folder:"
+    echo "Files in build folder:"
     ls -F ./build/ 2>/dev/null
     echo "Please run './scripts/build.sh' first."
     exit 1
