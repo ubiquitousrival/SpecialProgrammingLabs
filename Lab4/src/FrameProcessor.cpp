@@ -1,4 +1,5 @@
 #include "FrameProcessor.hpp"
+#include "Logger.hpp"
 #include <string>
 #include <iomanip>
 #include <sstream>
@@ -50,7 +51,9 @@ void FrameProcessor::process(cv::Mat& frame, ProcessMode mode, int brightnessVal
             cv::resize(frame, temp, cv::Size(), 1.0/pixelSize, 1.0/pixelSize, cv::INTER_NEAREST);
             cv::resize(temp, frame, frame.size(), 0, 0, cv::INTER_NEAREST);
             break;
-        default: break;
+        default: 
+            Logger::getInstance().warn("Unknown process mode encountered");
+            break;
     }
 
     if (isDetectionEnabled) {

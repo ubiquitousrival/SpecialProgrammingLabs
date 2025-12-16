@@ -1,13 +1,16 @@
 #include "FaceDetector.hpp"
+#include "Logger.hpp"
 #include <iostream>
 #include <chrono>
 
 FaceDetector::FaceDetector() : isRunning(true), hasNewFrame(false), artificialDelay(0), currentFps(0.0) {
-   try {
-    net = cv::dnn::readNetFromCaffe("deploy.prototxt", "res10_300x300_ssd_iter_140000.caffemodel");
-    workerThread = std::thread(&FaceDetector::inferenceLoop, this);
-} catch (const cv::Exception& e) {
-        std::cerr << "Detector Error: " << e.what() << std::endl;
+    try {
+        Logger::getInstance().info("Initializing FaceDetector...");
+        net = cv::dnn::readNetFromCaffe("deploy.prototxt", "res10_300x300_ssd_iter_140000.caffemodel");
+        workerThread = std::thread(&FaceDetector::inferenceLoop, this);
+        Logger::getInstance().info("FaceDetector initialized successfully");
+    } catch (const cv::Exception& e) {
+        Logger::getInstance().error("Detector Error: " + std::string(e.what()));
         isRunning = false;
     }
 }
@@ -15,6 +18,7 @@ FaceDetector::FaceDetector() : isRunning(true), hasNewFrame(false), artificialDe
 FaceDetector::~FaceDetector() {
     isRunning = false;
     if (workerThread.joinable()) workerThread.join();
+    Logger::getInstance().info("FaceDetector stopped");
 }
 
 void FaceDetector::setFrame(const cv::Mat& frame) {
@@ -42,6 +46,8 @@ void FaceDetector::inferenceLoop() {
     auto lastTime = std::chrono::steady_clock::now();
     int frameCount = 0;
     
+    Logger::getInstance().info("Inference loop started");
+
     while (isRunning) {
         bool shouldProcess = false;
         {
@@ -73,6 +79,10 @@ void FaceDetector::inferenceLoop() {
                     int y2 = static_cast<int>(detectionMat.at<float>(i, 6) * processFrame.rows);
                     newFaces.emplace_back(cv::Rect(cv::Point(x1, y1), cv::Point(x2, y2)));
                 }
+            }
+
+            if (!newFaces.empty()) {
+               Logger::getInstance().info("Faces detected: " + std::to_string(newFaces.size()));
             }
 
             {
