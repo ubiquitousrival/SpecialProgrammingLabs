@@ -1,7 +1,0 @@
-build/
-resources/*.caffemodel
-resources/*.prototxt
-*.prototxt
-.vscode/
-*.caffemodel
-models/
