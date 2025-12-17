@@ -4,7 +4,8 @@
 #include <mutex>
 
 enum class LogLevel {
-    INFO = 0,
+    DEBUG = 0, 
+    INFO,
     WARN,
     ERROR
 };
@@ -19,7 +20,9 @@ public:
         return instance;
     }
 
-    void setLevel(LogLevel level); // Новий метод
+    void setLevel(LogLevel level);
+    
+    void debug(const std::string& message); 
     void info(const std::string& message);
     void warn(const std::string& message);
     void error(const std::string& message);
@@ -34,5 +37,5 @@ private:
 
     std::ofstream logFile;
     std::mutex logMutex;
-    LogLevel currentLevel; // Поточний фільтр
+    LogLevel currentLevel;
 };

@@ -4,6 +4,8 @@
 #include "Display.hpp"
 #include "Logger.hpp"
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 int main() {
     Logger::getInstance().info("Application started");
@@ -23,9 +25,11 @@ int main() {
 
     while (true) {
         cv::Mat frame = camera.getFrame();
+        
         if (frame.empty()) {
-            Logger::getInstance().warn("Received empty frame from camera");
-            break;
+            Logger::getInstance().warn("Empty frame received. Waiting for camera...");
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            continue;
         }
 
         processor.process(

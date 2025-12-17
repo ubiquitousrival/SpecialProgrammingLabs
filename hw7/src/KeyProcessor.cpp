@@ -1,33 +1,36 @@
-#include "Logger.hpp"
 #include "KeyProcessor.hpp"
+#include "Logger.hpp"
 #include <iostream>
-
-KeyProcessor::KeyProcessor() 
-    : currentMode(ProcessMode::Normal), shouldExit(false), faceDetectionEnabled(false) {}
+#include <string>
+#include <map> 
 
 void KeyProcessor::processKey(int key) {
     if (key == -1) return;
-	Logger::getInstance().info("Key pressed code: " + std::to_string(key));
+
+    char keyChar = static_cast<char>(key);
+    Logger::getInstance().debug("Key pressed: '" + std::string(1, keyChar) + "' (code: " + std::to_string(key) + ")");
 
     if (key == 27 || key == 'q') shouldExit = true;
-    
+
     if (key == 'f' || key == 'F') {
         faceDetectionEnabled = !faceDetectionEnabled;
-        std::cout << "Face Detection: " << (faceDetectionEnabled ? "ON" : "OFF") << std::endl;
+        std::string status = faceDetectionEnabled ? "ON" : "OFF";
+        Logger::getInstance().info("Face Detection toggled: " + status);
     }
 
-    switch (key) {
-        case '1': currentMode = ProcessMode::Normal; break;
-        case '2': currentMode = ProcessMode::Invert; break;
-        case '3': currentMode = ProcessMode::Blur; break;
-        case '4': currentMode = ProcessMode::Canny; break;
-        case '5': currentMode = ProcessMode::Sobel; break;
-        case '6': currentMode = ProcessMode::Mirror; break;
-        case '7': currentMode = ProcessMode::Sepia; break;
-        case '8': currentMode = ProcessMode::Pixelize; break;
+    static std::map<int, std::string> modeNames = {
+        {'1', "None"}, {'2', "Invert"}, {'3', "Blur"},
+        {'4', "Canny"}, {'5', "Sobel"}, {'6', "Mirror"},
+        {'7', "Sepia"}, {'8', "Pixelize"}
+    };
+
+    if (key >= '1' && key <= '8') {
+        currentMode = static_cast<ProcessMode>(key - '1');
+        std::string modeName = modeNames.count(key) ? modeNames[key] : "Unknown";
+        Logger::getInstance().info("Switched to mode: " + modeName);
+    } 
+    else if (key == '=' || key == '+') {
+    } 
+    else if (key == '-' || key == '_') {
     }
 }
-
-ProcessMode KeyProcessor::getMode() const { return currentMode; }
-bool KeyProcessor::getShouldExit() const { return shouldExit; }
-bool KeyProcessor::isFaceDetectionEnabled() const { return faceDetectionEnabled; }

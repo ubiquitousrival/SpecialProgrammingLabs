@@ -22,6 +22,10 @@ void Logger::setLevel(LogLevel level) {
     currentLevel = level;
 }
 
+void Logger::debug(const std::string& message) {
+    log(LogLevel::DEBUG, message);
+}
+
 void Logger::info(const std::string& message) {
     log(LogLevel::INFO, message);
 }
@@ -48,11 +52,13 @@ void Logger::log(LogLevel level, const std::string& message) {
     std::string finalMsg = ss.str();
 
     if (level == LogLevel::ERROR) {
-        std::cerr << "\033[31m" << finalMsg << "\033[0m" << std::endl;
+        std::cerr << "\033[31m" << finalMsg << "\033[0m" << std::endl; 
     } else if (level == LogLevel::WARN) {
-        std::cout << "\033[33m" << finalMsg << "\033[0m" << std::endl;
+        std::cout << "\033[33m" << finalMsg << "\033[0m" << std::endl; 
+    } else if (level == LogLevel::INFO) {
+        std::cout << "\033[32m" << finalMsg << "\033[0m" << std::endl; 
     } else {
-        std::cout << "\033[32m" << finalMsg << "\033[0m" << std::endl;
+        std::cout << "\033[37m" << finalMsg << "\033[0m" << std::endl; 
     }
 
     if (logFile.is_open()) {
@@ -62,6 +68,7 @@ void Logger::log(LogLevel level, const std::string& message) {
 
 std::string Logger::levelToString(LogLevel level) {
     switch(level) {
+        case LogLevel::DEBUG: return "DEBUG"; 
         case LogLevel::INFO: return "INFO";
         case LogLevel::WARN: return "WARN";
         case LogLevel::ERROR: return "ERROR";

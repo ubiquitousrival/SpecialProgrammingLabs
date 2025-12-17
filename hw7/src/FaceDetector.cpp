@@ -82,7 +82,7 @@ void FaceDetector::inferenceLoop() {
             }
 
             if (!newFaces.empty()) {
-               Logger::getInstance().info("Faces detected: " + std::to_string(newFaces.size()));
+               Logger::getInstance().debug("Faces detected: " + std::to_string(newFaces.size()));
             }
 
             {
