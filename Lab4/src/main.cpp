@@ -19,7 +19,7 @@ int main() {
     KeyProcessor keys;
     FrameProcessor processor;
 
-    Logger::getInstance().info("Controls: F (Face), 1-8 (Modes), Sliders");
+    std::cout << "Controls: F (Face), 1-8 (Modes), Sliders" << std::endl;
 
     while (true) {
         cv::Mat frame = camera.getFrame();

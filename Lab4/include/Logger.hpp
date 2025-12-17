@@ -1,12 +1,13 @@
 #pragma once
-
-#include <iostream>
-#include <fstream>
 #include <string>
+#include <fstream>
 #include <mutex>
-#include <ctime>
-#include <iomanip>
-#include <sstream>
+
+enum class LogLevel {
+    INFO = 0,
+    WARN,
+    ERROR
+};
 
 class Logger {
 public:
@@ -18,6 +19,7 @@ public:
         return instance;
     }
 
+    void setLevel(LogLevel level); // Новий метод
     void info(const std::string& message);
     void warn(const std::string& message);
     void error(const std::string& message);
@@ -25,11 +27,12 @@ public:
 private:
     Logger();
     ~Logger();
-
-    void log(const std::string& level, const std::string& message);
+    void log(LogLevel level, const std::string& message);
     std::string getCurrentTime();
     std::string getFileNameTimestamp();
+    std::string levelToString(LogLevel level);
 
     std::ofstream logFile;
     std::mutex logMutex;
+    LogLevel currentLevel; // Поточний фільтр
 };

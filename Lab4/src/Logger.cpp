@@ -1,6 +1,10 @@
 #include "Logger.hpp"
+#include <iostream>
+#include <sstream>
+#include <iomanip>
+#include <ctime>
 
-Logger::Logger() {
+Logger::Logger() : currentLevel(LogLevel::INFO) {
     std::string filename = "log_" + getFileNameTimestamp() + ".txt";
     logFile.open(filename, std::ios::out);
     if (logFile.is_open()) {
@@ -14,30 +18,38 @@ Logger::~Logger() {
     }
 }
 
+void Logger::setLevel(LogLevel level) {
+    currentLevel = level;
+}
+
 void Logger::info(const std::string& message) {
-    log("INFO", message);
+    log(LogLevel::INFO, message);
 }
 
 void Logger::warn(const std::string& message) {
-    log("WARN", message);
+    log(LogLevel::WARN, message);
 }
 
 void Logger::error(const std::string& message) {
-    log("ERROR", message);
+    log(LogLevel::ERROR, message);
 }
 
-void Logger::log(const std::string& level, const std::string& message) {
-    std::lock_guard<std::mutex> lock(logMutex);
+void Logger::log(LogLevel level, const std::string& message) {
+    if (level < currentLevel) {
+        return;
+    }
 
+    std::lock_guard<std::mutex> lock(logMutex);
     std::string timestamp = getCurrentTime();
+    std::string levelStr = levelToString(level);
     
     std::stringstream ss;
-    ss << "[" << timestamp << "] [" << level << "] " << message;
+    ss << "[" << timestamp << "] [" << levelStr << "] " << message;
     std::string finalMsg = ss.str();
 
-    if (level == "ERROR") {
+    if (level == LogLevel::ERROR) {
         std::cerr << "\033[31m" << finalMsg << "\033[0m" << std::endl;
-    } else if (level == "WARN") {
+    } else if (level == LogLevel::WARN) {
         std::cout << "\033[33m" << finalMsg << "\033[0m" << std::endl;
     } else {
         std::cout << "\033[32m" << finalMsg << "\033[0m" << std::endl;
@@ -45,6 +57,15 @@ void Logger::log(const std::string& level, const std::string& message) {
 
     if (logFile.is_open()) {
         logFile << finalMsg << std::endl;
+    }
+}
+
+std::string Logger::levelToString(LogLevel level) {
+    switch(level) {
+        case LogLevel::INFO: return "INFO";
+        case LogLevel::WARN: return "WARN";
+        case LogLevel::ERROR: return "ERROR";
+        default: return "UNKNOWN";
     }
 }
 

@@ -1,3 +1,4 @@
+#include "Logger.hpp"
 #include "KeyProcessor.hpp"
 #include <iostream>
 
@@ -6,6 +7,7 @@ KeyProcessor::KeyProcessor()
 
 void KeyProcessor::processKey(int key) {
     if (key == -1) return;
+	Logger::getInstance().info("Key pressed code: " + std::to_string(key));
 
     if (key == 27 || key == 'q') shouldExit = true;
     
