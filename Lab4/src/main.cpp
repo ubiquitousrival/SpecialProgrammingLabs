@@ -3,16 +3,33 @@
 #include "FrameProcessor.hpp"
 #include "Display.hpp"
 #include "Logger.hpp"
+#include "ConfigManager.hpp"
 #include <iostream>
 #include <thread>
 #include <chrono>
 
+void setupLogging() {
+    std::string levelStr = ConfigManager::getInstance().getLogLevel();
+    LogLevel level = LogLevel::INFO;
+    
+    if (levelStr == "DEBUG") level = LogLevel::DEBUG;
+    else if (levelStr == "WARN") level = LogLevel::WARN;
+    else if (levelStr == "ERROR") level = LogLevel::ERROR;
+    
+    Logger::getInstance().setLevel(level);
+}
+
 int main() {
+    ConfigManager::getInstance().loadConfig("settings.json");
+    setupLogging();
+
     Logger::getInstance().info("Application started");
 
-    CameraProvider camera(0);
+    int camId = ConfigManager::getInstance().getCameraId(0);
+    CameraProvider camera(camId);
+    
     if (!camera.isOpened()) {
-        Logger::getInstance().error("Camera Error: Could not open device 0");
+        Logger::getInstance().error("Camera Error: Could not open device " + std::to_string(camId));
         return -1;
     }
     Logger::getInstance().info("Camera initialized successfully");

@@ -1,12 +1,17 @@
 #include "FaceDetector.hpp"
 #include "Logger.hpp"
+#include "ConfigManager.hpp"
 #include <iostream>
 #include <chrono>
 
 FaceDetector::FaceDetector() : isRunning(true), hasNewFrame(false), artificialDelay(0), currentFps(0.0) {
     try {
         Logger::getInstance().info("Initializing FaceDetector...");
-        net = cv::dnn::readNetFromCaffe("deploy.prototxt", "res10_300x300_ssd_iter_140000.caffemodel");
+        
+        std::string proto = ConfigManager::getInstance().getModelProto();
+        std::string weights = ConfigManager::getInstance().getModelWeights();
+        
+        net = cv::dnn::readNetFromCaffe(proto, weights);
         workerThread = std::thread(&FaceDetector::inferenceLoop, this);
         Logger::getInstance().info("FaceDetector initialized successfully");
     } catch (const cv::Exception& e) {
@@ -47,6 +52,7 @@ void FaceDetector::inferenceLoop() {
     int frameCount = 0;
     
     Logger::getInstance().info("Inference loop started");
+    float threshold = ConfigManager::getInstance().getModelThreshold();
 
     while (isRunning) {
         bool shouldProcess = false;
@@ -72,7 +78,7 @@ void FaceDetector::inferenceLoop() {
 
             for (int i = 0; i < detectionMat.rows; i++) {
                 float confidence = detectionMat.at<float>(i, 2);
-                if (confidence > 0.5) {
+                if (confidence > threshold) {
                     int x1 = static_cast<int>(detectionMat.at<float>(i, 3) * processFrame.cols);
                     int y1 = static_cast<int>(detectionMat.at<float>(i, 4) * processFrame.rows);
                     int x2 = static_cast<int>(detectionMat.at<float>(i, 5) * processFrame.cols);

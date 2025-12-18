@@ -16,6 +16,7 @@ add_executable(lab4_app
     src/FrameProcessor.cpp
     src/CameraProvider.cpp
     src/KeyProcessor.cpp
+    src/ConfigManager.cpp
 )
 
 target_link_libraries(lab4_app ${OpenCV_LIBS} Threads::Threads)
