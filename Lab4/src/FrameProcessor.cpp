@@ -1,80 +1,78 @@
 #include "FrameProcessor.hpp"
-#include "Logger.hpp"
-#include <string>
-#include <iomanip>
-#include <sstream>
+#include <iostream>
 
-void FrameProcessor::process(cv::Mat& frame, ProcessMode mode, int brightnessVal, int effectVal, int lagVal, bool isDetectionEnabled) {
+void FrameProcessor::process(cv::Mat& frame, ProcessMode mode, int brightness, int effectValue, int lagValue, bool faceDetection) {
     
-    detector.setDelay(lagVal);
+    detector.setDelay(lagValue);
+    detector.setFrame(frame);
 
-    if (isDetectionEnabled) {
-        detector.setFrame(frame);
+    if (faceDetection) {
+        std::vector<cv::Rect> faces = detector.getResults();
+        for (const auto& rect : faces) {
+            cv::rectangle(frame, rect, cv::Scalar(0, 255, 0), 2);
+        }
     }
 
-    double alpha = 1.0 + (brightnessVal - 50) / 50.0;
-    frame.convertTo(frame, -1, alpha, 0);
-
-    cv::Mat temp, kernel, sepia;
-    int pixelSize, k;
+    if (brightness != 0) {
+        frame.convertTo(frame, -1, 1, brightness);
+    }
 
     switch (mode) {
-        case ProcessMode::Invert:
-            cv::bitwise_not(frame, frame);
-            break;
-        case ProcessMode::Blur:
-            k = (effectVal / 10) * 2 + 1; 
-            cv::GaussianBlur(frame, frame, cv::Size(k, k), 0);
-            break;
-        case ProcessMode::Canny:
-            cv::cvtColor(frame, temp, cv::COLOR_BGR2GRAY);
-            cv::Canny(temp, temp, effectVal * 2 + 10, (effectVal * 2 + 10) * 2);
-            cv::cvtColor(temp, frame, cv::COLOR_GRAY2BGR); 
-            break;
-        case ProcessMode::Sobel:
-            cv::cvtColor(frame, temp, cv::COLOR_BGR2GRAY);
-            cv::Sobel(temp, temp, CV_8U, 1, 0, 3);
-            cv::cvtColor(temp, temp, cv::COLOR_GRAY2BGR);
-            cv::addWeighted(temp, effectVal / 100.0, frame, 1.0 - (effectVal / 100.0), 0, frame);
-            break;
-        case ProcessMode::Mirror:
-            cv::flip(frame, frame, 1);
-            break;
-        case ProcessMode::Sepia:
-            kernel = (cv::Mat_<float>(3, 3) << 0.272, 0.534, 0.131, 0.349, 0.686, 0.168, 0.393, 0.769, 0.189);
-            cv::transform(frame, sepia, kernel);
-            cv::addWeighted(sepia, effectVal / 100.0, frame, 1.0 - (effectVal / 100.0), 0, frame);
-            break;
-        case ProcessMode::Pixelize:
-            pixelSize = (effectVal / 5) + 1;
-            if (pixelSize < 1) pixelSize = 1;
-            cv::resize(frame, temp, cv::Size(), 1.0/pixelSize, 1.0/pixelSize, cv::INTER_NEAREST);
-            cv::resize(temp, frame, frame.size(), 0, 0, cv::INTER_NEAREST);
-            break;
-        default: 
-            Logger::getInstance().warn("Unknown process mode encountered");
-            break;
+        case ProcessMode::Invert:   applyInvert(frame); break;
+        case ProcessMode::Blur:     applyBlur(frame, effectValue); break;
+        case ProcessMode::Canny:    applyCanny(frame, effectValue); break;
+        case ProcessMode::Sobel:    applySobel(frame); break;
+        case ProcessMode::Mirror:   applyMirror(frame); break;
+        case ProcessMode::Sepia:    applySepia(frame); break;
+        case ProcessMode::Pixelize: applyPixelize(frame, effectValue); break;
+        default: break;
     }
+}
 
-    if (isDetectionEnabled) {
-        std::vector<cv::Rect> faces = detector.getResults();
-        
-        for (auto rect : faces) {
-            if (mode == ProcessMode::Mirror) {
-                rect.x = frame.cols - rect.x - rect.width;
-            }
-            
-            cv::rectangle(frame, rect, cv::Scalar(0, 255, 0), 2);
-            cv::putText(frame, "Face", cv::Point(rect.x, rect.y - 10), 
-                        cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2);
-        }
+void FrameProcessor::applyInvert(cv::Mat& frame) {
+    cv::bitwise_not(frame, frame);
+}
 
-        std::stringstream ss;
-        ss << "Detector FPS: " << std::fixed << std::setprecision(1) << detector.getFps();
-        cv::putText(frame, ss.str(), cv::Point(10, 60), 
-                    cv::FONT_HERSHEY_SIMPLEX, 0.7, cv::Scalar(0, 0, 255), 2);
-    }
-    
-    cv::putText(frame, "Mode: " + std::to_string((int)mode), cv::Point(10, 30), 
-                cv::FONT_HERSHEY_SIMPLEX, 0.7, cv::Scalar(0, 255, 0), 2);
+void FrameProcessor::applyBlur(cv::Mat& frame, int value) {
+    int ksize = (value % 2 == 0) ? value + 1 : value; 
+    if (ksize < 1) ksize = 1;
+    cv::GaussianBlur(frame, frame, cv::Size(ksize, ksize), 0);
+}
+
+void FrameProcessor::applyCanny(cv::Mat& frame, int value) {
+    if (value < 10) value = 10;
+    cv::cvtColor(frame, frame, cv::COLOR_BGR2GRAY);
+    cv::Canny(frame, frame, value, value * 2);
+    cv::cvtColor(frame, frame, cv::COLOR_GRAY2BGR);
+}
+
+void FrameProcessor::applySobel(cv::Mat& frame) {
+    cv::Mat gray, grad_x, grad_y, abs_grad_x, abs_grad_y;
+    cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
+    cv::Sobel(gray, grad_x, CV_16S, 1, 0, 3);
+    cv::Sobel(gray, grad_y, CV_16S, 0, 1, 3);
+    cv::convertScaleAbs(grad_x, abs_grad_x);
+    cv::convertScaleAbs(grad_y, abs_grad_y);
+    cv::addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, frame);
+    cv::cvtColor(frame, frame, cv::COLOR_GRAY2BGR);
+}
+
+void FrameProcessor::applyMirror(cv::Mat& frame) {
+    cv::flip(frame, frame, 1);
+}
+
+void FrameProcessor::applySepia(cv::Mat& frame) {
+    cv::Mat kernel = (cv::Mat_<float>(3, 3) <<
+        0.272, 0.534, 0.131,
+        0.349, 0.686, 0.168,
+        0.393, 0.769, 0.189);
+    cv::transform(frame, frame, kernel);
+}
+
+void FrameProcessor::applyPixelize(cv::Mat& frame, int value) {
+    if (value < 1) value = 1;
+    int h = frame.rows;
+    int w = frame.cols;
+    cv::resize(frame, frame, cv::Size(w / value, h / value), 0, 0, cv::INTER_LINEAR);
+    cv::resize(frame, frame, cv::Size(w, h), 0, 0, cv::INTER_NEAREST);
 }
