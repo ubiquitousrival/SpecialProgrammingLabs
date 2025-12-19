@@ -1,20 +1,18 @@
 #pragma once
-
-enum class ProcessMode {
-    Normal, Invert, Blur, Canny, Sobel, Mirror, Sepia, Pixelize
-};
+#include "FrameProcessor.hpp" 
+#include <opencv2/opencv.hpp>
 
 class KeyProcessor {
-private:
-    ProcessMode currentMode;
-    bool shouldExit;
-    bool faceDetectionEnabled;
-
 public:
     KeyProcessor();
+
     void processKey(int key);
-    
     ProcessMode getMode() const;
-    bool getShouldExit() const;
     bool isFaceDetectionEnabled() const;
+    bool getShouldExit() const;
+
+private:
+    ProcessMode currentMode;
+    bool faceDetectionEnabled;
+    bool shouldExit;
 };
