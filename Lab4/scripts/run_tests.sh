@@ -10,7 +10,7 @@ cmake ..
 make
 
 echo "Copying test assets..."
-cp ../test_face.jpg . 2>/dev/null
+cp ../picture/test_face.jpg . 2>/dev/null
 
 echo "Running Google Tests..."
 ./run_tests

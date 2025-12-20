@@ -34,5 +34,5 @@ jobs:
     - name: Run Tests
       run: |
         cd Lab4/build
-        cp ../test_face.jpg . || true 
+        cp ../picture/test_face.jpg . || true
         ctest --output-on-failure
