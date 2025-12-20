@@ -11,7 +11,8 @@ int main() {
     ConfigManager& config = ConfigManager::getInstance();
     config.loadConfig("settings.json");
 
-    Logger::getInstance().setLogLevel(config.getLogLevel());
+    Logger::getInstance().setLevel(config.getLogLevel());
+    
     Logger::getInstance().info("Application started");
 
     CameraProvider camera(config.getCameraId());
