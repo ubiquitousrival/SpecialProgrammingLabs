@@ -2,7 +2,7 @@ name: Build Lab4 Project
 
 on:
   push:
-    branches: [ "main", "hw9" ]
+    branches: [ "main", "hw10" ]
   pull_request:
     branches: [ "main" ]
 
@@ -30,3 +30,9 @@ jobs:
       run: |
         cd Lab4/build
         make
+
+    - name: Run Tests
+      run: |
+        cd Lab4/build
+        cp ../test_face.jpg . || true 
+        ctest --output-on-failure

@@ -1,12 +1,12 @@
 #pragma once
-#include <opencv2/videoio.hpp>
-#include <opencv2/core.hpp>
+#include <opencv2/opencv.hpp>
+#include "IFrameSource.hpp"
 
-class CameraProvider {
+class CameraProvider : public IFrameSource {
 private:
     cv::VideoCapture cap;
 public:
-    CameraProvider(int deviceId = 0);
-    cv::Mat getFrame();
-    bool isOpened();
+    CameraProvider(int deviceId);
+    cv::Mat getFrame() override;
+    bool isOpened() override;
 };
