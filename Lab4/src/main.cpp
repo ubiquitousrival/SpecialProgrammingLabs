@@ -12,17 +12,23 @@ int main() {
     config.loadConfig("settings.json");
 
     std::string levelStr = config.getLogLevel();
-    LogLevel level = LogLevel::INFO; 
-
+    LogLevel level = LogLevel::INFO;
     if (levelStr == "DEBUG") level = LogLevel::DEBUG;
     else if (levelStr == "ERROR") level = LogLevel::ERROR;
     else if (levelStr == "WARN" || levelStr == "WARNING") level = LogLevel::WARN;
     
     Logger::getInstance().setLevel(level);
-    
     Logger::getInstance().info("Application started");
 
-    CameraProvider camera(config.getCameraId());
+    int camId = config.getCameraId(0);
+    int width = config.getFrameWidth(640);   
+    int height = config.getFrameHeight(480); 
+
+    Logger::getInstance().info("Opening camera " + std::to_string(camId) + 
+                               " with resolution " + std::to_string(width) + "x" + std::to_string(height));
+
+    CameraProvider camera(camId, width, height);
+    
     if (!camera.isOpened()) {
         Logger::getInstance().error("Failed to open camera!");
         return -1;
