@@ -7,6 +7,9 @@ class Display : public IFrameDisplay {
 public:
     Display(const std::string& title);
     void show(const cv::Mat& frame) override;
+    
+    std::string getName(); 
+
     int brightness;
     int effectValue;
     int lagValue;
