@@ -1,9 +1,6 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include "Logger.hpp"
-#include <iostream>
-#include <opencv2/opencv.hpp>
-#include "Logger.hpp"
 #include "ConfigManager.hpp"
 #include "CameraProvider.hpp"
 #include "Display.hpp"
@@ -19,7 +16,7 @@ int main() {
 
     if (levelStr == "DEBUG") level = LogLevel::DEBUG;
     else if (levelStr == "ERROR") level = LogLevel::ERROR;
-    else if (levelStr == "WARN" || levelStr == "WARNING") level = LogLevel::WARNING;
+    else if (levelStr == "WARN" || levelStr == "WARNING") level = LogLevel::WARN;
     
     Logger::getInstance().setLevel(level);
     
