@@ -1,6 +1,9 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include "Logger.hpp"
+#include <iostream>
+#include <opencv2/opencv.hpp>
+#include "Logger.hpp"
 #include "ConfigManager.hpp"
 #include "CameraProvider.hpp"
 #include "Display.hpp"
@@ -11,7 +14,14 @@ int main() {
     ConfigManager& config = ConfigManager::getInstance();
     config.loadConfig("settings.json");
 
-    Logger::getInstance().setLevel(config.getLogLevel());
+    std::string levelStr = config.getLogLevel();
+    LogLevel level = LogLevel::INFO; 
+
+    if (levelStr == "DEBUG") level = LogLevel::DEBUG;
+    else if (levelStr == "ERROR") level = LogLevel::ERROR;
+    else if (levelStr == "WARN" || levelStr == "WARNING") level = LogLevel::WARNING;
+    
+    Logger::getInstance().setLevel(level);
     
     Logger::getInstance().info("Application started");
 
