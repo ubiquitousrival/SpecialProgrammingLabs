@@ -1,74 +1,58 @@
-#include "CameraProvider.hpp"
-#include "KeyProcessor.hpp"
-#include "FrameProcessor.hpp"
-#include "Display.hpp"
+#include <iostream>
+#include <opencv2/opencv.hpp>
 #include "Logger.hpp"
 #include "ConfigManager.hpp"
-#include <iostream>
-#include <thread>
-#include <chrono>
-
-void setupLogging() {
-    std::string levelStr = ConfigManager::getInstance().getLogLevel();
-    LogLevel level = LogLevel::INFO;
-    
-    if (levelStr == "DEBUG") level = LogLevel::DEBUG;
-    else if (levelStr == "WARN") level = LogLevel::WARN;
-    else if (levelStr == "ERROR") level = LogLevel::ERROR;
-    
-    Logger::getInstance().setLevel(level);
-}
+#include "CameraProvider.hpp"
+#include "Display.hpp"
+#include "FrameProcessor.hpp"
+#include "KeyProcessor.hpp"
 
 int main() {
-    ConfigManager::getInstance().loadConfig("settings.json");
-    setupLogging();
+    ConfigManager& config = ConfigManager::getInstance();
+    config.loadConfig("settings.json");
 
+    Logger::getInstance().setLogLevel(config.getLogLevel());
     Logger::getInstance().info("Application started");
 
-    int camId = ConfigManager::getInstance().getCameraId(0);
-    CameraProvider camera(camId);
-    
+    CameraProvider camera(config.getCameraId());
     if (!camera.isOpened()) {
-        Logger::getInstance().error("Camera Error: Could not open device " + std::to_string(camId));
+        Logger::getInstance().error("Failed to open camera!");
         return -1;
     }
-    Logger::getInstance().info("Camera initialized successfully");
 
-    Display display("Lab 4: Advanced Architecture");
-    KeyProcessor keys;
+    Display display("Lab 4: Final System");
     FrameProcessor processor;
+    KeyProcessor keyProcessor;
 
-    std::cout << "Controls: F (Face), 1-8 (Modes), Sliders" << std::endl;
+    Logger::getInstance().info("Entering main loop");
 
     while (true) {
         cv::Mat frame = camera.getFrame();
-        
         if (frame.empty()) {
-            Logger::getInstance().warn("Empty frame received. Waiting for camera...");
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            Logger::getInstance().warn("Empty frame received");
             continue;
         }
 
+        int key = cv::waitKey(1);
+        keyProcessor.processKey(key);
+
+        if (keyProcessor.getShouldExit()) {
+            Logger::getInstance().info("Exit signal received");
+            break;
+        }
+
         processor.process(
-            frame,
-            keys.getMode(),
-            display.brightness,
-            display.effectValue,
-            display.lagValue,
-            keys.isFaceDetectionEnabled()
+            frame, 
+            keyProcessor.getMode(), 
+            display.getBrightness(),  
+            display.getEffectValue(), 
+            display.getLagValue(),    
+            keyProcessor.isFaceDetectionEnabled()
         );
 
         display.show(frame);
-
-        int key = cv::waitKey(10);
-        keys.processKey(key);
-
-        if (keys.getShouldExit()) {
-            Logger::getInstance().info("Exit key pressed. Stopping application...");
-            break;
-        }
     }
-    
+
     Logger::getInstance().info("Application finished");
     return 0;
 }
