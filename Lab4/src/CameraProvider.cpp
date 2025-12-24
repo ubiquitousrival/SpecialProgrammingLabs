@@ -1,7 +1,12 @@
 #include "CameraProvider.hpp"
 
-CameraProvider::CameraProvider(int deviceId) {
+CameraProvider::CameraProvider(int deviceId, int width, int height) {
     cap.open(deviceId);
+    
+    if (cap.isOpened()) {
+        cap.set(cv::CAP_PROP_FRAME_WIDTH, width);
+        cap.set(cv::CAP_PROP_FRAME_HEIGHT, height);
+    }
 }
 
 cv::Mat CameraProvider::getFrame() {
